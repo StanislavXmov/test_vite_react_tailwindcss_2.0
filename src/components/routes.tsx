@@ -26,3 +26,9 @@ export const homeRoute = createRoute({
   path: "/",
   component: Home,
 });
+
+export const profileRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/profile",
+  component: () => <div>profile</div>,
+});

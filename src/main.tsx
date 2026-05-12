@@ -1,12 +1,12 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import { homeRoute, rootRoute } from "./components/routes.tsx";
+import { homeRoute, rootRoute, profileRoute } from "./components/routes.tsx";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { createRouter, RouterProvider } from "@tanstack/react-router";
 
 import "./index.css";
 
-const routeTree = rootRoute.addChildren([homeRoute]);
+const routeTree = rootRoute.addChildren([homeRoute, profileRoute]);
 
 const queryClient = new QueryClient();
 

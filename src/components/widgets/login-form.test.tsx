@@ -1,23 +1,8 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
+import { createDeferred } from "@/lib/test-utils";
 import { LoginForm } from "./login-form";
-
-function createDeferred() {
-	let resolve!: () => void;
-	let reject!: (reason?: unknown) => void;
-
-	const promise = new Promise<void>((res, rej) => {
-		resolve = res;
-		reject = rej;
-	});
-
-	return {
-		promise,
-		resolve,
-		reject,
-	};
-}
 
 // setup
 async function _fillLoginForm(

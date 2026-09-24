@@ -5,15 +5,15 @@ import { createDeferred } from "@/lib/test-utils";
 import { LoginForm } from "./login-form";
 
 // setup
-async function _fillLoginForm(
-	user: ReturnType<typeof userEvent.setup>,
-	email: string,
-	password: string,
-) {
-	await user.type(screen.getByRole("textbox", { name: /email/i }), email);
+// async function _fillLoginForm(
+// 	user: ReturnType<typeof userEvent.setup>,
+// 	email: string,
+// 	password: string,
+// ) {
+// 	await user.type(screen.getByRole("textbox", { name: /email/i }), email);
 
-	await user.type(screen.getByLabelText(/password/i), password);
-}
+// 	await user.type(screen.getByLabelText(/password/i), password);
+// }
 
 describe("LoginForm", () => {
 	it("form contains Email, Password, and a Sign in button", () => {

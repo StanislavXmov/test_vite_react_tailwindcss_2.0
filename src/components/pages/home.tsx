@@ -1,3 +1,5 @@
+import { Form } from "../widgets/form/form";
+
 export function Home() {
 	return (
 		<div className="min-h-screen bg-linear-to-r from-blue-50 to-indigo-100">
@@ -143,6 +145,9 @@ export function Home() {
 						Start Free Trial
 					</button>
 				</div>
+			</section>
+			<section>
+				<Form />
 			</section>
 		</div>
 	);

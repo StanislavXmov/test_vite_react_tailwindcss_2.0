@@ -34,6 +34,16 @@
 						"functions": ["cn", "clsx", "cva"]
 					}
 				}
+			},
+			"correctness": {
+				"noUnusedImports": {
+					"level": "error",
+					"fix": "none"
+				},
+				"noUnusedVariables": {
+					"level": "error",
+					"fix": "none"
+				}
 			}
 		}
 	},

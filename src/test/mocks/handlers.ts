@@ -1,5 +1,10 @@
 import { HttpResponse, http } from "msw";
 
+interface CreateUserDto {
+	name: string;
+	email: string;
+}
+
 export const handlers = [
 	http.get("/api/profile", () => {
 		return HttpResponse.json({
@@ -26,5 +31,22 @@ export const handlers = [
 		}
 
 		return HttpResponse.json([]);
+	}),
+
+	http.post<never, CreateUserDto>("/api/users", async ({ request }) => {
+		const body = await request.json();
+
+		if (body.name === "Alice" && body.email === "alice@example.com") {
+			return HttpResponse.json({
+				id: "1",
+				name: body.name,
+				email: body.email,
+			});
+		}
+
+		return HttpResponse.json(
+			{ message: "Invalid request body" },
+			{ status: 400 },
+		);
 	}),
 ];

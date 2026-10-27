@@ -1,9 +1,39 @@
-import { OrbitControls } from "@react-three/drei";
+import { Html, OrbitControls, Outlines } from "@react-three/drei";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { useRef } from "react";
-import type { Mesh } from "three";
+import type { ReactNode } from "react";
+import { Component, Suspense, useEffect, useMemo, useRef } from "react";
+import type { Mesh, Texture } from "three";
+import { DataTexture, NearestFilter, RedFormat } from "three";
+import { ToonModel } from "../3d/toon-model";
 
-function RotatingCube() {
+// Place the future file in public/models/ and set e.g. "/models/model.glb".
+const MODEL_URL: string | null = "/models/block.glb";
+
+class ModelErrorBoundary extends Component<
+	{ children: ReactNode },
+	{ failed: boolean }
+> {
+	state = { failed: false };
+
+	static getDerivedStateFromError() {
+		return { failed: true };
+	}
+
+	render() {
+		if (this.state.failed) {
+			return (
+				<Html center>
+					<p className="w-64 rounded bg-slate-900 p-4 text-center text-sm text-red-300">
+						Не удалось загрузить GLB. Проверьте файл и путь к модели.
+					</p>
+				</Html>
+			);
+		}
+		return this.props.children;
+	}
+}
+
+function RotatingCube({ gradientMap }: { gradientMap: Texture }) {
 	const meshRef = useRef<Mesh>(null);
 
 	useFrame((_, delta) => {
@@ -15,12 +45,29 @@ function RotatingCube() {
 	return (
 		<mesh ref={meshRef} position={[0, 1.25, 0]} castShadow>
 			<boxGeometry args={[1.5, 1.5, 1.5]} />
-			<meshStandardMaterial color="#818cf8" roughness={0.35} metalness={0.15} />
+			<meshToonMaterial color="#818cf8" gradientMap={gradientMap} />
+			<Outlines color="#080c14" thickness={3} toneMapped={false} />
 		</mesh>
 	);
 }
 
 export function Home() {
+	const gradientMap = useMemo(() => {
+		const texture = new DataTexture(
+			new Uint8Array([40, 100, 175, 255]),
+			4,
+			1,
+			RedFormat,
+		);
+		texture.minFilter = NearestFilter;
+		texture.magFilter = NearestFilter;
+		texture.generateMipmaps = false;
+		texture.needsUpdate = true;
+		return texture;
+	}, []);
+
+	useEffect(() => () => gradientMap.dispose(), [gradientMap]);
+
 	return (
 		<div className="relative h-dvh w-full">
 			<Canvas
@@ -32,14 +79,44 @@ export function Home() {
 				}
 			>
 				<color attach="background" args={["#111827"]} />
-				<ambientLight intensity={0.6} />
+				<ambientLight intensity={0.25} />
 				<directionalLight
 					position={[5, 8, 5]}
-					intensity={2}
+					intensity={1.5}
 					castShadow
-					shadow-mapSize={[1024, 1024]}
+					shadow-mapSize={[2048, 2048]}
+					// Offset shadow samples from the surface to prevent self-shadow stripes.
+					shadow-bias={-0.0002}
+					shadow-normalBias={0.03}
+					shadow-camera-near={0.5}
+					shadow-camera-far={25}
+					shadow-camera-left={-4}
+					shadow-camera-right={4}
+					shadow-camera-top={4}
+					shadow-camera-bottom={-4}
 				/>
-				<RotatingCube />
+				{MODEL_URL ? (
+					<ModelErrorBoundary key={MODEL_URL}>
+						<Suspense
+							fallback={
+								<Html center>
+									<p className="whitespace-nowrap text-sm text-slate-300">
+										Загрузка модели…
+									</p>
+								</Html>
+							}
+						>
+							<ToonModel
+								url={MODEL_URL}
+								gradientMap={gradientMap}
+								outlineColor="#080c14"
+								outlineThickness={3}
+							/>
+						</Suspense>
+					</ModelErrorBoundary>
+				) : (
+					<RotatingCube gradientMap={gradientMap} />
+				)}
 				<mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
 					<planeGeometry args={[20, 20]} />
 					<meshStandardMaterial color="#1f2937" roughness={0.9} />
